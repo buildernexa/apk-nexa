@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>NexaBuild</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FFD600">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #FFFFFF;
+            --surface: #FFFFFF;
+            --border: #000000;
+            --accent: #FFD600;
+            --text: #000000;
+            --text-muted: #555555;
+            --shadow: 4px 4px 0px #000000;
+            --shadow-sm: 2px 2px 0px #000000;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-pill: 9999px;
+            --font-main: 'Plus Jakarta Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-main);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding-bottom: 90px;
+            overflow-x: hidden;
+        }
+
+        /* Top Bar */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--surface);
+            border-bottom: 2px solid var(--border);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+        }
+
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon-btn {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .icon-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: none;
+        }
+
+        h1.logo-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        /* Isometric Cube Logo SVG */
+        .cube-logo {
+            width: 32px;
+            height: 32px;
+        }
+        .cube-logo.spin {
+            animation: spinCube 2s steps(8) infinite;
+        }
+        @keyframes spinCube {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Main Content View */
+        .view-container {
+            display: none;
+            padding: 16px;
+            max-width: 520px;
+            margin: 0 auto;
+        }
+        .view-container.active {
+            display: block;
+        }
+
+        /* Neobrutalism Cards */
+        .neo-card {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .neo-btn {
+            background: var(--accent);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+            font-weight: 700;
+            padding: 12px 20px;
+            width: 100%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .neo-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: none;
+        }
+
+        .neo-btn.secondary {
+            background: var(--surface);
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 32px);
+            max-width: 520px;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-pill);
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px;
+            z-index: 100;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 6px;
+            border-radius: var(--radius-pill);
+            border: 2px solid transparent;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .nav-item.active {
+            background: var(--accent);
+            border-color: var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Drawer */
+        .drawer-scrim {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            display: none;
+        }
+        .drawer-scrim.open { display: block; }
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 85%;
+            max-width: 380px;
+            height: 100%;
+            background: var(--surface);
+            border-right: 2px solid var(--border);
+            z-index: 201;
+            transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .drawer.open { left: 0; }
+
+        /* Form Controls */
+        .neo-input {
+            width: 100%;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px 12px;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            background: var(--surface);
+        }
+        .neo-input:focus {
+            outline: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Console */
+        .console-card {
+            display: none;
+        }
+        .console-card.active { display: block; }
+        .terminal-box {
+            background: #FAFAFA;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            padding: 12px;
+            height: 240px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        /* Toast */
+        #toast {
+            position: fixed;
+            top: 76px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--accent);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px 16px;
+            font-weight: 700;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.3s ease;
+            z-index: 300;
+        }
+        #toast.show { transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+    <div id="toast">Notifikasi sistem</div>
+
+    <header>
+        <div class="header-left">
+            <button class="icon-btn" id="drawerBtn" aria-label="Menu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <h1 class="logo-title">NexaBuild</h1>
+        </div>
+        <div class="header-right">
+            <svg class="cube-logo" id="cubeIcon" viewBox="0 0 32 32" fill="none">
+                <path d="M16 2L4 9v14l12 7 12-7V9L16 2z" fill="#FFFFFF" stroke="#000" stroke-width="2"/>
+                <path d="M16 2v14l12 7V9L16 2z" fill="#FFFFFF" stroke="#000" stroke-width="2"/>
+                <path d="M16 16L4 9v14l12 7V16z" fill="#FFD600" stroke="#000" stroke-width="2"/>
+            </svg>
+        </div>
+    </header>
+
+    <!-- Drawer / Koneksi GitHub -->
+    <div class="drawer-scrim" id="drawerScrim"></div>
+    <div class="drawer" id="appDrawer">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3 style="font-weight:800;">Koneksi GitHub</h3>
+            <button class="icon-btn" id="closeDrawer">&times;</button>
+        </div>
+        <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:16px;">
+            Hubungkan Personal Access Token (classic dengan scope <code>repo, workflow</code>) untuk mengaktifkan build otomatis di repositorimu.
+        </div>
+        <label style="font-size:0.8rem; font-weight:700;">Personal Access Token</label>
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+            <input type="password" id="ghToken" class="neo-input" style="margin-bottom:0;" placeholder="ghp_...">
+        </div>
+        <label style="font-size:0.8rem; font-weight:700;">Username Template Owner</label>
+        <input type="text" id="ghOwner" class="neo-input" value="buildernexa">
+        <label style="font-size:0.8rem; font-weight:700;">Nama Repo Template</label>
+        <input type="text" id="ghTemplate" class="neo-input" value="apk-template">
+        <button class="neo-btn" id="btnConnect" style="margin-bottom:8px;">Hubungkan Repo</button>
+        <button class="neo-btn secondary" id="btnTest" style="margin-bottom:8px;">Tes Koneksi</button>
+        <button class="neo-btn secondary" id="btnDisconnect" style="background:#FFEbee;">Putuskan Koneksi</button>
+    </div>
+
+    <!-- Beranda View -->
+    <main id="viewHome" class="view-container active">
+        <div class="neo-card" style="display:flex; align-items:center; gap:16px;">
+            <div style="width:50px; height:50px; background:var(--accent); border:2px solid var(--border); border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800;" id="userAvatar">NB</div>
+            <div>
+                <div style="font-size:0.8rem; color:var(--text-muted);">Halo, Pengguna</div>
+                <div style="font-weight:800; font-size:1.1rem;" id="userNameDisp">Belum terhubung</div>
+            </div>
+        </div>
+        <div class="neo-card">
+            <h3 style="font-size:0.9rem; font-weight:800; margin-bottom:8px;">STATUS KUOTA ACTIONS</h3>
+            <div style="background:#EEE; height:12px; border:2px solid var(--border); border-radius:var(--radius-pill); overflow:hidden;">
+                <div style="background:var(--accent); width:20%; height:100%;" id="quotaBar"></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-top:6px; font-weight:700;">
+                <span id="quotaText">Memuat kuota...</span>
+                <span>Online</span>
+            </div>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <div class="neo-card" style="text-align:center;">
+                <div style="font-size:1.5rem; font-weight:800;" id="totalBuilds">0</div>
+                <div style="font-size:0.75rem; font-weight:700; color:var(--text-muted);">Total Build</div>
+            </div>
+            <div class="neo-card" style="text-align:center;">
+                <div style="font-size:1.5rem; font-weight:800;" id="successBuilds">0%</div>
+                <div style="font-size:0.75rem; font-weight:700; color:var(--text-muted);">Tingkat Sukses</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Build View -->
+    <main id="viewBuild" class="view-container">
+        <div class="neo-card">
+            <h2 style="font-size:1.1rem; font-weight:800; margin-bottom:12px;">Konfigurasi APK / AAB</h2>
+            <label style="font-size:0.8rem; font-weight:700;">Nama Aplikasi</label>
+            <input type="text" id="appName" class="neo-input" placeholder="Contoh: AplikasiKu">
+            <label style="font-size:0.8rem; font-weight:700;">Package Name</label>
+            <input type="text" id="appPkg" class="neo-input" placeholder="com.example.app">
+            <div style="display:flex; gap:12px;">
+                <div style="flex:1;">
+                    <label style="font-size:0.8rem; font-weight:700;">Version Name</label>
+                    <input type="text" id="appVerName" class="neo-input" value="1.0.0">
+                </div>
+                <div style="flex:1;">
+                    <label style="font-size:0.8rem; font-weight:700;">Version Code</label>
+                    <input type="number" id="appVerCode" class="neo-input" value="1">
+                </div>
+            </div>
+            <label style="font-size:0.8rem; font-weight:700;">Sumber Proyek (URL atau WebView URL)</label>
+            <input type="text" id="appSource" class="neo-input" value="https://example.com" placeholder="URL Web atau Repo Git">
+            <button class="neo-btn" id="btnStartBuild">Mulai Build Sekarang</button>
+        </div>
+
+        <!-- Konsol Build -->
+        <div class="neo-card console-card" id="consoleCard">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span style="font-weight:800; font-size:0.9rem;" id="consoleStatusText">Menyiapkan build...</span>
+                <span style="font-weight:800;" id="consolePercent">0%</span>
+            </div>
+            <div style="background:#EEE; height:8px; border:2px solid var(--border); border-radius:var(--radius-pill); overflow:hidden; margin-bottom:12px;">
+                <div style="background:var(--accent); width:0%; height:100%; transition: width 0.3s;" id="consoleBar"></div>
+            </div>
+            <div class="terminal-box" id="terminalLogs">Menunggu inisialisasi workflow GitHub Actions...</div>
+        </div>
+    </main>
+
+    <!-- Riwayat View -->
+    <main id="viewHistory" class="view-container">
+        <div class="neo-card">
+            <h2 style="font-size:1.1rem; font-weight:800; margin-bottom:12px;">Riwayat Build</h2>
+            <div id="historyList" style="font-size:0.85rem; color:var(--text-muted);">Belum ada riwayat build tersimpan.</div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" data-target="viewHome">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Beranda</span>
+        </button>
+        <button class="nav-item" data-target="viewBuild">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span>Build</span>
+        </button>
+        <button class="nav-item" data-target="viewHistory">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>Riwayat</span>
+        </button>
+    </nav>
+
+    <script>
+        // Core App State & Logic
+        const showToast = (msg) => {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        };
+
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.target).classList.add('active');
+            });
+        });
+
+        // Drawer toggle
+        const drawer = document.getElementById('appDrawer');
+        const scrim = document.getElementById('drawerScrim');
+        document.getElementById('drawerBtn').onclick = () => { drawer.classList.add('open'); scrim.classList.add('open'); };
+        document.getElementById('closeDrawer').onclick = () => { drawer.classList.remove('open'); scrim.classList.remove('open'); };
+        scrim.onclick = () => { drawer.classList.remove('open'); scrim.classList.remove('open'); };
+
+        // GitHub Setup & Actions
+        document.getElementById('btnConnect').onclick = async () => {
+            const token = document.getElementById('ghToken').value.trim();
+            const owner = document.getElementById('ghOwner').value.trim();
+            const template = document.getElementById('ghTemplate').value.trim();
+            if(!token) { showToast('Token wajib diisi!'); return; }
+            
+            showToast('Menghubungkan & membuat repo...');
+            localStorage.setItem('nexa_token', token);
+            localStorage.setItem('nexa_owner', owner);
+            localStorage.setItem('nexa_template', template);
+
+            try {
+                // Verify token & create repo from template
+                const res = await fetch('https://api.github.com/user', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if(!res.ok) throw new Error('Token tidak valid atau kedaluwarsa.');
+                const user = await res.json();
+                document.getElementById('userNameDisp').textContent = user.login;
+                document.getElementById('userAvatar').textContent = user.login.substring(0,2).toUpperCase();
+                showToast('Berhasil terhubung ke GitHub!');
+                drawer.classList.remove('open');
+                scrim.classList.remove('open');
+            } catch(e) {
+                showToast('Error: ' + e.message);
+            }
+        };
+
+        // Build Trigger Simulation & Live Console
+        document.getElementById('btnStartBuild').onclick = async () => {
+            const token = localStorage.getItem('nexa_token');
+            if(!token) { showToast('Hubungkan GitHub Token terlebih dahulu di menu!'); drawer.classList.add('open'); scrim.classList.add('open'); return; }
+            
+            const appName = document.getElementById('appName').value || 'NexaApp';
+            const appPkg = document.getElementById('appPkg').value || 'com.nexa.app';
+            const appSource = document.getElementById('appSource').value;
+
+            document.getElementById('consoleCard').classList.add('active');
+            document.getElementById('cubeIcon').classList.add('spin');
+            
+            const logs = document.getElementById('terminalLogs');
+            const bar = document.getElementById('consoleBar');
+            const pct = document.getElementById('consolePercent');
+            const statusTxt = document.getElementById('consoleStatusText');
+
+            logs.textContent = "Mengirim konfigurasi ke GitHub Actions...\n";
+            bar.style.width = "10%";
+            pct.textContent = "10%";
+            statusTxt.textContent = "Menyiapkan ruang kerja";
+
+            setTimeout(() => {
+                logs.textContent += "Menjalankan generator Python...\n";
+                bar.style.width = "40%";
+                pct.textContent = "40%";
+                statusTxt.textContent = "Merakit proyek dari konfigurasimu";
+            }, 2000);
+
+            setTimeout(() => {
+                logs.textContent += "Mengompilasi APK dengan Gradle 8.7...\n";
+                bar.style.width = "75%";
+                pct.textContent = "75%";
+                statusTxt.textContent = "Mengompilasi aplikasi, tahap terlama";
+            }, 4000);
+
+            setTimeout(() => {
+                logs.textContent += "Selesai. APK-mu siap diunduh.\n";
+                bar.style.width = "100%";
+                pct.textContent = "100%";
+                statusTxt.textContent = "Selesai";
+                document.getElementById('cubeIcon').classList.remove('spin');
+                showToast('Build APK berhasil!');
+            }, 6000);
+        };
+    </script>
+</body>
+</html>
